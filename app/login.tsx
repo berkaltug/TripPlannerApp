@@ -1,21 +1,19 @@
-import { Link, Stack } from "expo-router";
-import { StyleSheet } from "react-native";
+import { Link } from "expo-router";
+import { StyleSheet, Text } from "react-native";
 
 import GoogleSignInButton from "@/components/social-auth-buttons/GoogleSignInButton";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function LoginScreen() {
+export default function ViewLoginScreen() {
   return (
     <>
-      <Stack.Screen options={{ title: "Login" }} />
-      <ThemedView style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <GoogleSignInButton />
-        <ThemedText type="title">Login</ThemedText>
+        <Text>Login</Text>
         <Link href="/" style={styles.link}>
-          <ThemedText type="link">Try to navigate to home screen!</ThemedText>
+          <Text>Try to navigate to home screen!</Text>
         </Link>
-      </ThemedView>
+      </SafeAreaView>
     </>
   );
 }

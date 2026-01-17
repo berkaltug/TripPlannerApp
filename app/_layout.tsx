@@ -1,27 +1,20 @@
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
-import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import "react-native-reanimated";
 
 import { SplashScreenController } from "@/components/SplashScreenController";
 
 import { useAuthContext } from "@/hooks/useAuthContext";
 import AuthProvider from "@/providers/AuthProvider";
-import "global.css";
-import { useColorScheme } from "react-native";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 // Separate RootNavigator so we can access the AuthContext
 function RootNavigator() {
   const { isLoggedIn } = useAuthContext();
+  console.log("isLoggedIn", isLoggedIn);
 
   return (
     <Stack>
-      <Stack.Protected guard={isLoggedIn}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Protected guard={!!isLoggedIn}>
+        <Stack.Screen name="(app)" options={{ headerShown: false }} />
       </Stack.Protected>
       <Stack.Protected guard={!isLoggedIn}>
         <Stack.Screen name="login" options={{ headerShown: false }} />
@@ -31,25 +24,14 @@ function RootNavigator() {
   );
 }
 
+const queryClient = new QueryClient();
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
-  const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  });
-
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
-
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <SplashScreenController />
         <RootNavigator />
-        <StatusBar style="auto" />
       </AuthProvider>
-    </ThemeProvider>
+    </QueryClientProvider>
   );
 }
