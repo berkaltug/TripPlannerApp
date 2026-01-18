@@ -8,7 +8,7 @@ import { styles } from "./styles";
 const AddTripButton = () => {
   const router = useRouter();
   const onPress = () => {
-    router.push("/add-trip");
+    router.push("/trip/add-trip");
   };
   return (
     <TouchableOpacity onPress={onPress} style={styles.button}>
