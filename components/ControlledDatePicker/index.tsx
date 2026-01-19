@@ -42,21 +42,18 @@ const ControlledDatePicker: React.FC<ControlledDatePickerProps> = ({
       rules={{ required: "Tarih seçimi zorunludur" }}
       render={({ field: { onChange, value } }) => (
         <View>
-          {/* Tetikleyici Alan (Input Görünümlü) */}
           <TouchableOpacity
             onPress={() => setShowPicker(true)}
             style={[styles.dateInput, errors?.[name] && styles.errorBorder]}
           >
             <Text style={styles.dateText}>
-              {value
-                ? new Date(value).toLocaleDateString("tr-TR")
-                : "Tarih Seçiniz"}
+              {value ? new Date(value).toLocaleDateString() : "Tarih Seçiniz"}
             </Text>
           </TouchableOpacity>
 
           {showPicker && isAndroid() && (
             <DateTimePicker
-              value={new Date(value) || new Date()}
+              value={value || new Date()}
               mode="date"
               display="default"
               minimumDate={minimumDate}
@@ -74,7 +71,6 @@ const ControlledDatePicker: React.FC<ControlledDatePickerProps> = ({
             >
               <View style={styles.iosModalContainer}>
                 <View style={styles.iosPickerWrapper}>
-                  {/* iOS'a özel "Bitti" Butonu */}
                   <View style={styles.iosHeader}>
                     <TouchableOpacity onPress={() => setShowPicker(false)}>
                       <Text style={styles.iosDoneButton}>Select</Text>

@@ -6,7 +6,7 @@ import { useAuthContext } from "@/hooks/useAuthContext";
 import { TripSchema, tripSchema } from "@/lib/schema/tripSchema";
 import { addTrip } from "@/services/TripService";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -24,7 +24,7 @@ const AddTrip = () => {
     resolver: zodResolver(tripSchema),
     mode: "onChange",
   });
-
+  const queryClient = useQueryClient();
   const startDate = watch("startDate");
   const endDate = watch("endDate");
 
@@ -38,6 +38,7 @@ const AddTrip = () => {
         type: "success",
         text1: "Trip Added Successfully",
       });
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
       router.navigate("/");
     },
     onError: (error) => {
@@ -51,7 +52,6 @@ const AddTrip = () => {
   });
 
   const onSubmit: SubmitHandler<TripSchema> = (data) => {
-    console.log("add trip data", data);
     mutation.mutate({
       userId: profile?.id,
       ...data,

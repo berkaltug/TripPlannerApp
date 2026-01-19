@@ -8,10 +8,13 @@ import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 const HomePage = () => {
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["trips"],
     queryFn: getTrips,
+    staleTime: 0,
+    gcTime: 0,
   });
+
   if (isLoading) return <Text>Loading...</Text>;
   if (isError) return <Text>Error: {error.message}</Text>;
   return (

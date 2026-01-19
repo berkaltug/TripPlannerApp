@@ -2,7 +2,6 @@ import BackButton from "@/components/BackButton";
 import ControlledDatePicker from "@/components/ControlledDatePicker";
 import ControlledTextInput from "@/components/ControlledTextInput";
 import Header from "@/components/Header";
-import { invalidateTripsQuery } from "@/lib/queryHelper";
 import { TripNoteSchema, tripNoteSchema } from "@/lib/schema/tripNoteSchema";
 import { addTripNote } from "@/services/TripNoteService";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,7 +34,7 @@ const AddTripNotePage = () => {
         type: "success",
         text1: "Trip Note Added Successfully",
       });
-      invalidateTripsQuery(queryClient);
+      queryClient.invalidateQueries({ queryKey: ["trip"] });
       router.back();
     },
     onError: () => {

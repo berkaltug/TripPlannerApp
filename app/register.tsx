@@ -5,7 +5,6 @@ import { LoginSchema, loginSchema } from "@/lib/schema/loginSchema";
 import { signUp } from "@/services/LoginService";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -20,7 +19,6 @@ const RegisterPage = () => {
   } = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
   });
-  const router = useRouter();
   const mutation = useMutation({
     mutationFn: signUp,
     onSuccess: () => {
@@ -28,7 +26,6 @@ const RegisterPage = () => {
         type: "success",
         text1: "Registered Successfully",
       });
-      router.back();
     },
     onError: (error) => {
       Toast.show({
@@ -61,7 +58,7 @@ const RegisterPage = () => {
           style={styles.button}
           onPress={handleSubmit(handleRegisterPress)}
         >
-          <Text>Login</Text>
+          <Text>Register</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

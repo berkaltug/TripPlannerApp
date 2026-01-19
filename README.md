@@ -1,50 +1,114 @@
-# Welcome to your Expo app 👋
+###Setup instructions:
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+1. Run `npm install` to install dependencies
+2. Run `npx expo start` to start the development server
+3. Run `npx expo run:ios` to run the app on iOS simulator
+4. Run `npx expo run:android` to run the app on Android emulator
 
-## Get started
+This project uses supabase services but not locally. To use it locally, you need to set up your own supabase project and replace the supabase url and anon key in the .env file.
 
-1. Install dependencies
+### To run this app by connecting mine supabase server , i will provide you the .env file.Here .env.example
 
-   ```bash
-   npm install
-   ```
+EXPO_PUBLIC_SUPABASE_URL=
+EXPO_PUBLIC_SUPABASE_ANON_KEY=
 
-2. Start the app
+### Db table structure
 
-   ```bash
-   npx expo start
-   ```
+There are 2 tables , trips , trip_notes , for local supabase setup these should be generated.<br>
+Also supabase default auth starter db sql implemented, and it created a profiles table.
 
-In the output, you'll find options to open the app in a
+```
+-- 1. Create the TRIPS table
+create table public.trips (
+  id uuid not null default gen_random_uuid() primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  title text not null,
+  destination text not null,
+  start_date date not null,
+  end_date date not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+-- 2. Create the TRIP_NOTES table
+create table public.trip_notes (
+  id uuid not null default gen_random_uuid() primary key,
+  trip_id uuid not null references public.trips(id) on delete cascade,
+  note_date date not null,
+  content text not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+-- 3. Enable Row Level Security (RLS) on both tables
+alter table public.trips enable row level security;
+alter table public.trip_notes enable row level security;
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Row Level security policies must be added , here are the policy rules
 
-## Learn more
+```
+-- TRIP NOTES POLICIES
+-- Allow users to view their own trips
+create policy "Users can view own trips"
+on public.trips for select
+using (auth.uid() = user_id);
 
-To learn more about developing your project with Expo, look at the following resources:
+-- Allow users to insert their own trips
+create policy "Users can insert own trips"
+on public.trips for insert
+with check (auth.uid() = user_id);
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+-- Allow users to update their own trips
+create policy "Users can update own trips"
+on public.trips for update
+using (auth.uid() = user_id);
 
-## Join the community
+-- Allow users to delete their own trips
+create policy "Users can delete own trips"
+on public.trips for delete
+using (auth.uid() = user_id);
 
-Join our community of developers creating universal apps.
+-- TRIP TABLE POLICIES
+-- Allow users to view notes belonging to their trips
+create policy "Users can view notes of own trips"
+on public.trip_notes for select
+using (
+  exists (
+    select 1 from public.trips
+    where trips.id = trip_notes.trip_id
+    and trips.user_id = auth.uid()
+  )
+);
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+-- Allow users to insert notes into their own trips
+create policy "Users can insert notes to own trips"
+on public.trip_notes for insert
+with check (
+  exists (
+    select 1 from public.trips
+    where trips.id = trip_notes.trip_id
+    and trips.user_id = auth.uid()
+  )
+);
+
+-- Allow users to update notes of their own trips
+create policy "Users can update notes of own trips"
+on public.trip_notes for update
+using (
+  exists (
+    select 1 from public.trips
+    where trips.id = trip_notes.trip_id
+    and trips.user_id = auth.uid()
+  )
+);
+
+-- Allow users to delete notes of their own trips
+create policy "Users can delete notes of own trips"
+on public.trip_notes for delete
+using (
+  exists (
+    select 1 from public.trips
+    where trips.id = trip_notes.trip_id
+    and trips.user_id = auth.uid()
+  )
+);
+```

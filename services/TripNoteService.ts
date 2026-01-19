@@ -1,3 +1,4 @@
+import { getLocalYYYYMMDD } from "@/lib/helper";
 import { TripNoteSchema } from "@/lib/schema/tripNoteSchema";
 import { supabase } from "@/lib/supabase";
 
@@ -32,7 +33,7 @@ export const addTripNote = async ({
 }: AddTripNoteType) => {
   const { error } = await supabase.from("trip_notes").insert({
     trip_id: tripId,
-    note_date: noteDate,
+    note_date: getLocalYYYYMMDD(noteDate),
     content: content,
   });
   if (error) {
@@ -62,7 +63,7 @@ export const updateTripNote = async ({
   const { error } = await supabase
     .from("trip_notes")
     .update({
-      note_date: noteDate,
+      note_date: getLocalYYYYMMDD(noteDate),
       content: content,
     })
     .eq("id", tripNoteId);

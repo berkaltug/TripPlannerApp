@@ -3,7 +3,6 @@ import ControlledDatePicker from "@/components/ControlledDatePicker";
 import ControlledTextInput from "@/components/ControlledTextInput";
 import Header from "@/components/Header";
 import Loading from "@/components/Loading";
-import { invalidateTripsQuery } from "@/lib/queryHelper";
 import { TripNoteSchema, tripNoteSchema } from "@/lib/schema/tripNoteSchema";
 import {
   deleteTripNote,
@@ -48,7 +47,7 @@ const EditTripNotePage = () => {
         type: "success",
         text1: "Trip Note Updated Successfully",
       });
-      invalidateTripsQuery(queryClient);
+      queryClient.invalidateQueries({ queryKey: ["trip"] });
       router.back();
     },
     onError: () => {
@@ -72,7 +71,7 @@ const EditTripNotePage = () => {
         type: "success",
         text1: "Trip Note Deleted Successfully",
       });
-      invalidateTripsQuery(queryClient);
+      queryClient.invalidateQueries({ queryKey: ["trip"] });
       router.back();
     },
     onError: () => {

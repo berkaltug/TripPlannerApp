@@ -1,3 +1,4 @@
+import { getLocalYYYYMMDD } from "@/lib/helper";
 import { TripSchema } from "@/lib/schema/tripSchema";
 import { supabase } from "@/lib/supabase";
 
@@ -19,8 +20,8 @@ export const addTrip = async ({
     user_id: userId,
     title,
     destination,
-    start_date: startDate,
-    end_date: endDate,
+    start_date: getLocalYYYYMMDD(startDate),
+    end_date: getLocalYYYYMMDD(endDate),
   });
   if (error) throw error;
   return data;
@@ -50,8 +51,8 @@ export const updateTrip = async ({
       title,
       user_id: userId,
       destination,
-      start_date: startDate,
-      end_date: endDate,
+      start_date: getLocalYYYYMMDD(startDate),
+      end_date: getLocalYYYYMMDD(endDate),
     })
     .eq("id", id);
   if (error) throw error;
