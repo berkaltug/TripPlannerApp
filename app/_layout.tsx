@@ -10,7 +10,6 @@ import Toast from "react-native-toast-message";
 // Separate RootNavigator so we can access the AuthContext
 function RootNavigator() {
   const { isLoggedIn } = useAuthContext();
-  console.log("isLoggedIn", isLoggedIn);
 
   return (
     <>

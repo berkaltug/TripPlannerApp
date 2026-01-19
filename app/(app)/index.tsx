@@ -5,7 +5,7 @@ import TripItem from "@/components/TripItem";
 import { getTrips } from "@/services/TripService";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 const HomePage = () => {
   const { data, isLoading, isError, error } = useQuery({
@@ -16,20 +16,22 @@ const HomePage = () => {
   if (isError) return <Text>Error: {error.message}</Text>;
   return (
     <SafeAreaView style={styles.container}>
-      <View>
+      <View style={{ flex: 1 }}>
         <Header title="Home" rightComponent={<AddTripButton />} />
-        {data &&
-          data.length > 0 &&
-          data.map((trip) => (
-            <TripItem
-              key={trip.id}
-              id={trip.id}
-              title={trip.title}
-              destination={trip.destination}
-              startDate={trip.start_date}
-              endDate={trip.end_date}
-            />
-          ))}
+        <ScrollView style={{ flex: 1 }}>
+          {data &&
+            data.length > 0 &&
+            data.map((trip) => (
+              <TripItem
+                key={trip.id}
+                id={trip.id}
+                title={trip.title}
+                destination={trip.destination}
+                startDate={trip.start_date}
+                endDate={trip.end_date}
+              />
+            ))}
+        </ScrollView>
       </View>
       <SignOutButton />
     </SafeAreaView>

@@ -51,7 +51,6 @@ export default function GoogleSignInButton() {
       console.error("onSignInButtonPress - openAuthSessionAsync - error", {
         err,
       });
-      console.log(err);
     });
 
     console.debug("onSignInButtonPress - openAuthSessionAsync - result", {

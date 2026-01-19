@@ -12,7 +12,13 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Alert, StyleSheet, Text, TouchableOpacity } from "react-native";
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
@@ -120,55 +126,60 @@ const TripPage = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Header leftComponent={<BackButton />} title="Edit Trip" />
-      <ControlledTextInput control={control} name="title" />
-      {errors.title && (
-        <Text style={styles.errorText}>{errors.title.message}</Text>
-      )}
-      <ControlledTextInput control={control} name="destination" />
-      {errors.destination && (
-        <Text style={styles.errorText}>{errors.destination.message}</Text>
-      )}
-      <Text>Pick Start Date</Text>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <ControlledTextInput control={control} name="title" />
+        {errors.title && (
+          <Text style={styles.errorText}>{errors.title.message}</Text>
+        )}
+        <ControlledTextInput control={control} name="destination" />
+        {errors.destination && (
+          <Text style={styles.errorText}>{errors.destination.message}</Text>
+        )}
+        <Text>Pick Start Date</Text>
 
-      <ControlledDatePicker
-        control={control}
-        name="startDate"
-        maximumDate={
-          endDate && !isNaN(endDate?.getTime()) ? endDate : undefined
-        }
-      />
-      {errors.startDate && (
-        <Text style={styles.errorText}>{errors.startDate.message}</Text>
-      )}
-      <Text>Pick End Date</Text>
-      <ControlledDatePicker
-        control={control}
-        name="endDate"
-        minimumDate={
-          startDate && !isNaN(startDate?.getTime()) ? startDate : undefined
-        }
-      />
-      {errors.endDate && (
-        <Text style={styles.errorText}>{errors.endDate.message}</Text>
-      )}
-      <Text>Notes</Text>
-      <TripNoteList
-        tripNotes={data?.trip_notes || []}
-        startDate={data?.start_date}
-        endDate={data?.end_date}
-      />
-      <TouchableOpacity onPress={handleSubmit(onSubmit)} style={styles.button}>
-        <Text>Update</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={onPressAddNote}>
-        <Text> + Add Note</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={onDelete}
-        style={[styles.button, { backgroundColor: "red" }]}
-      >
-        <Text>Delete</Text>
-      </TouchableOpacity>
+        <ControlledDatePicker
+          control={control}
+          name="startDate"
+          maximumDate={
+            endDate && !isNaN(endDate?.getTime()) ? endDate : undefined
+          }
+        />
+        {errors.startDate && (
+          <Text style={styles.errorText}>{errors.startDate.message}</Text>
+        )}
+        <Text>Pick End Date</Text>
+        <ControlledDatePicker
+          control={control}
+          name="endDate"
+          minimumDate={
+            startDate && !isNaN(startDate?.getTime()) ? startDate : undefined
+          }
+        />
+        {errors.endDate && (
+          <Text style={styles.errorText}>{errors.endDate.message}</Text>
+        )}
+        <TouchableOpacity
+          onPress={handleSubmit(onSubmit)}
+          style={styles.button}
+        >
+          <Text>Update</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={onPressAddNote}>
+          <Text>+ Add Note</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={onDelete}
+          style={[styles.button, { backgroundColor: "red" }]}
+        >
+          <Text>Delete</Text>
+        </TouchableOpacity>
+        <Text style={styles.notesHeader}>Notes</Text>
+        <TripNoteList
+          tripNotes={data?.trip_notes || []}
+          startDate={data?.start_date}
+          endDate={data?.end_date}
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -192,5 +203,10 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 12,
     marginTop: 5,
+  },
+  notesHeader: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginVertical: 6,
   },
 });

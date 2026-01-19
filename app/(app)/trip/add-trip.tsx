@@ -34,7 +34,6 @@ const AddTrip = () => {
   const mutation = useMutation({
     mutationFn: addTrip,
     onSuccess: (data) => {
-      console.log(data);
       Toast.show({
         type: "success",
         text1: "Trip Added Successfully",
@@ -52,9 +51,7 @@ const AddTrip = () => {
   });
 
   const onSubmit: SubmitHandler<TripSchema> = (data) => {
-    console.log("onSubmit", data);
-    console.log("star date", data.startDate);
-
+    console.log("add trip data", data);
     mutation.mutate({
       userId: profile?.id,
       ...data,

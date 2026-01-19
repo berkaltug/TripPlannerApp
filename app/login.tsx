@@ -24,7 +24,6 @@ export default function ViewLoginScreen() {
   const mutation = useMutation({
     mutationFn: signIn,
     onSuccess: (data) => {
-      console.log(data);
       Toast.show({
         type: "success",
         text1: "Login Successful",

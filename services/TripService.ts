@@ -1,3 +1,4 @@
+import { TripSchema } from "@/lib/schema/tripSchema";
 import { supabase } from "@/lib/supabase";
 
 export const getTrips = async () => {
@@ -6,19 +7,14 @@ export const getTrips = async () => {
   return data;
 };
 
+export type AddTripType = { userId: string } & TripSchema;
 export const addTrip = async ({
   userId,
   title,
   destination,
   startDate,
   endDate,
-}: {
-  userId: string;
-  title: string;
-  destination: string;
-  startDate: string;
-  endDate: string;
-}) => {
+}: AddTripType) => {
   const { data, error } = await supabase.from("trips").insert({
     user_id: userId,
     title,
@@ -36,10 +32,10 @@ export const getTripById = async (id: string) => {
     .select("*,trip_notes(*)")
     .eq("id", id);
   if (error) throw error;
-  console.log("trip data", data[0]);
   return data[0];
 };
 
+export type UpdateTripType = { id: string; userId: string } & TripSchema;
 export const updateTrip = async ({
   id,
   userId,
@@ -47,14 +43,7 @@ export const updateTrip = async ({
   destination,
   startDate,
   endDate,
-}: {
-  id: string;
-  userId: string;
-  title: string;
-  destination: string;
-  startDate: string;
-  endDate: string;
-}) => {
+}: UpdateTripType) => {
   const { data, error } = await supabase
     .from("trips")
     .update({
