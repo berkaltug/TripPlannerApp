@@ -23,11 +23,16 @@ export const getTripNotes = async (tripId: string) => {
   return data as TripNote[];
 };
 
-export const addTripNote = async (
-  tripId: string,
-  noteDate: string,
-  content: string,
-) => {
+export const addTripNote = async ({
+  tripId,
+  noteDate,
+  content,
+}: {
+  tripId: string;
+  noteDate: string;
+  content: string;
+}) => {
+  console.log("noteDate", noteDate);
   const { error } = await supabase.from("trip_notes").insert({
     trip_id: tripId,
     note_date: noteDate,
@@ -51,11 +56,15 @@ export const getTripNoteById = async (tripNoteId: string) => {
   return data[0] as TripNote;
 };
 
-export const updateTripNote = async (
-  tripNoteId: string,
-  noteDate: string,
-  content: string,
-) => {
+export const updateTripNote = async ({
+  tripNoteId,
+  noteDate,
+  content,
+}: {
+  tripNoteId: string;
+  noteDate: string;
+  content: string;
+}) => {
   const { error } = await supabase
     .from("trip_notes")
     .update({

@@ -6,6 +6,7 @@ const TripLayout = () => {
     <Stack>
       <Stack.Screen name="[id]" options={{ headerShown: false }} />
       <Stack.Screen name="add-trip" options={{ headerShown: false }} />
+      <Stack.Screen name="trip-note" options={{ headerShown: false }} />
     </Stack>
   );
 };

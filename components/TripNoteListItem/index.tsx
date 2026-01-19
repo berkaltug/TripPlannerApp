@@ -3,9 +3,18 @@ import React from "react";
 import { Text, TouchableOpacity } from "react-native";
 import { styles } from "./styles";
 
-const TripNoteListItem = ({ tripNote }: { tripNote: TripNote }) => {
+const TripNoteListItem = ({
+  tripNote,
+  onPressNote,
+}: {
+  tripNote: TripNote;
+  onPressNote: (tripNoteId: string) => void;
+}) => {
   return (
-    <TouchableOpacity style={styles.container}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={() => onPressNote(tripNote.id)}
+    >
       <Text style={styles.content}>{tripNote.content}</Text>
       <Text>{tripNote.note_date}</Text>
     </TouchableOpacity>

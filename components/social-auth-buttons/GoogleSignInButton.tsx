@@ -111,7 +111,8 @@ export default function GoogleSignInButton() {
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
         shadowRadius: 2,
-        elevation: 2, // For Android shadow
+        elevation: 2,
+        marginVertical: 10,
       }}
       activeOpacity={0.8}
     >

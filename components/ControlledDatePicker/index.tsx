@@ -10,13 +10,17 @@ import { styles } from "./styles";
 export interface ControlledDatePickerProps {
   control: any;
   name: string;
-  errors: any;
+  errors?: any;
+  minimumDate?: Date;
+  maximumDate?: Date;
 }
 
 const ControlledDatePicker: React.FC<ControlledDatePickerProps> = ({
   control,
   name,
   errors,
+  minimumDate = new Date(),
+  maximumDate,
 }) => {
   const [showPicker, setShowPicker] = React.useState(false);
   const handleDateChange = (
@@ -41,7 +45,7 @@ const ControlledDatePicker: React.FC<ControlledDatePickerProps> = ({
           {/* Tetikleyici Alan (Input Görünümlü) */}
           <TouchableOpacity
             onPress={() => setShowPicker(true)}
-            style={[styles.dateInput, errors.startDate && styles.errorBorder]}
+            style={[styles.dateInput, errors?.[name] && styles.errorBorder]}
           >
             <Text style={styles.dateText}>
               {value
@@ -55,7 +59,8 @@ const ControlledDatePicker: React.FC<ControlledDatePickerProps> = ({
               value={new Date(value) || new Date()}
               mode="date"
               display="default"
-              minimumDate={new Date()}
+              minimumDate={minimumDate}
+              maximumDate={maximumDate}
               onChange={(e, date) => handleDateChange(e, date, onChange)}
             />
           )}
@@ -79,8 +84,9 @@ const ControlledDatePicker: React.FC<ControlledDatePickerProps> = ({
                   <DateTimePicker
                     value={value || new Date()}
                     mode="date"
-                    minimumDate={new Date()}
-                    display="spinner" // iOS stili tekerlek görünümü
+                    minimumDate={minimumDate}
+                    maximumDate={maximumDate}
+                    display="spinner"
                     onChange={(e, date) => handleDateChange(e, date, onChange)}
                     textColor="black"
                   />

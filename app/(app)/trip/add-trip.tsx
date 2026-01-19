@@ -3,7 +3,9 @@ import ControlledDatePicker from "@/components/ControlledDatePicker";
 import ControlledTextInput from "@/components/ControlledTextInput";
 import Header from "@/components/Header";
 import { useAuthContext } from "@/hooks/useAuthContext";
+import { TripSchema, tripSchema } from "@/lib/schema/tripSchema";
 import { addTrip } from "@/services/TripService";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -12,19 +14,19 @@ import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
-interface FormValues {
-  title: string;
-  destination: string;
-  startDate: string;
-  endDate: string;
-}
-
 const AddTrip = () => {
   const {
     control,
     handleSubmit,
-    formState: { errors },
-  } = useForm<FormValues>();
+    watch,
+    formState: { errors, isValid },
+  } = useForm<TripSchema>({
+    resolver: zodResolver(tripSchema),
+    mode: "onChange",
+  });
+
+  const startDate = watch("startDate");
+  const endDate = watch("endDate");
 
   const { profile } = useAuthContext();
   const router = useRouter();
@@ -49,7 +51,10 @@ const AddTrip = () => {
     },
   });
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
+  const onSubmit: SubmitHandler<TripSchema> = (data) => {
+    console.log("onSubmit", data);
+    console.log("star date", data.startDate);
+
     mutation.mutate({
       userId: profile?.id,
       ...data,
@@ -64,23 +69,50 @@ const AddTrip = () => {
         name="title"
         placeholder="Name Your Trip"
       />
+      {errors.title && (
+        <Text style={styles.errorText}>{errors.title.message}</Text>
+      )}
       <ControlledTextInput
         control={control}
         name="destination"
         placeholder="Your Destination"
       />
+      {errors.destination && (
+        <Text style={styles.errorText}>{errors.destination.message}</Text>
+      )}
 
       <Text>Pick Start Date</Text>
 
       <ControlledDatePicker
         control={control}
         name="startDate"
-        errors={errors}
+        maximumDate={
+          endDate && !isNaN(endDate?.getTime()) ? new Date(endDate) : undefined
+        }
       />
-      <Text>Pick End Date</Text>
-      <ControlledDatePicker control={control} name="endDate" errors={errors} />
+      {errors.startDate && (
+        <Text style={styles.errorText}>{errors.startDate.message}</Text>
+      )}
 
-      <TouchableOpacity onPress={handleSubmit(onSubmit)} style={styles.button}>
+      <Text>Pick End Date</Text>
+      <ControlledDatePicker
+        control={control}
+        name="endDate"
+        minimumDate={
+          startDate && !isNaN(startDate?.getTime())
+            ? new Date(startDate)
+            : undefined
+        }
+      />
+      {errors.endDate && (
+        <Text style={styles.errorText}>{errors.endDate.message}</Text>
+      )}
+
+      <TouchableOpacity
+        onPress={handleSubmit(onSubmit)}
+        style={[styles.button, !isValid && styles.disabledButton]}
+        disabled={!isValid}
+      >
         <Text>Submit</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -101,5 +133,13 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 10,
     alignSelf: "flex-end",
+  },
+  disabledButton: {
+    backgroundColor: "#ccc",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 12,
+    marginTop: 5,
   },
 });

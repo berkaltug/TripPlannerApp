@@ -1,6 +1,6 @@
 import React from "react";
 import { Control, Controller } from "react-hook-form";
-import { TextInput } from "react-native";
+import { StyleProp, TextInput, TextStyle } from "react-native";
 import { styles } from "./styles";
 
 export interface ControlledTextInputProps {
@@ -8,6 +8,9 @@ export interface ControlledTextInputProps {
   name: string;
   placeholder?: string;
   numberOfLines?: number;
+  multiline?: boolean;
+  inputStyle?: StyleProp<TextStyle>;
+  secureTextEntry?: boolean;
 }
 
 const ControlledTextInput: React.FC<ControlledTextInputProps> = ({
@@ -15,6 +18,9 @@ const ControlledTextInput: React.FC<ControlledTextInputProps> = ({
   name,
   placeholder,
   numberOfLines = 1,
+  multiline = false,
+  inputStyle,
+  secureTextEntry = false,
 }) => {
   return (
     <Controller
@@ -23,11 +29,14 @@ const ControlledTextInput: React.FC<ControlledTextInputProps> = ({
       render={({ field }) => (
         <TextInput
           numberOfLines={numberOfLines}
-          style={styles.input}
+          style={[styles.input, inputStyle]}
           onBlur={field.onBlur}
           onChangeText={field.onChange}
           value={field.value || ""}
           placeholder={placeholder}
+          multiline={multiline}
+          textAlignVertical="top"
+          secureTextEntry={secureTextEntry}
         />
       )}
     />

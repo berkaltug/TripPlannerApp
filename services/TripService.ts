@@ -36,6 +36,7 @@ export const getTripById = async (id: string) => {
     .select("*,trip_notes(*)")
     .eq("id", id);
   if (error) throw error;
+  console.log("trip data", data[0]);
   return data[0];
 };
 

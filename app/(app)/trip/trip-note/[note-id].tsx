@@ -2,19 +2,31 @@ import BackButton from "@/components/BackButton";
 import ControlledDatePicker from "@/components/ControlledDatePicker";
 import ControlledTextInput from "@/components/ControlledTextInput";
 import Header from "@/components/Header";
+import Loading from "@/components/Loading";
 import { TripNoteSchema, tripNoteSchema } from "@/lib/schema/tripNoteSchema";
-import { addTripNote } from "@/services/TripNoteService";
+import {
+  deleteTripNote,
+  getTripNoteById,
+  updateTripNote,
+} from "@/services/TripNoteService";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
-const AddTripNotePage = () => {
+const EditTripNotePage = () => {
   const router = useRouter();
+  const { tripNoteId, startDate, endDate } = useLocalSearchParams();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["trip-note", tripNoteId],
+    queryFn: () => getTripNoteById(tripNoteId as string),
+  });
+
   const {
     control,
     handleSubmit,
@@ -22,38 +34,76 @@ const AddTripNotePage = () => {
   } = useForm<TripNoteSchema>({
     resolver: zodResolver(tripNoteSchema),
     mode: "onChange",
+    values: {
+      content: data?.content,
+      noteDate: new Date(data?.note_date as string),
+    },
   });
-
-  const { tripId, startDate, endDate } = useLocalSearchParams();
-
   const mutation = useMutation({
-    mutationFn: addTripNote,
+    mutationFn: updateTripNote,
     onSuccess: () => {
       Toast.show({
         type: "success",
-        text1: "Trip Note Added Successfully",
+        text1: "Trip Note Updated Successfully",
       });
       router.back();
     },
     onError: () => {
       Toast.show({
         type: "error",
-        text1: "Trip Note Added Failed",
+        text1: "Trip Note Update Failed",
       });
     },
   });
-
   const onSubmit: SubmitHandler<TripNoteSchema> = (data) => {
     mutation.mutate({
-      tripId: tripId as string,
+      tripNoteId: tripNoteId as string,
       noteDate: data.noteDate,
       content: data.content,
     });
   };
+  const deleteMutation = useMutation({
+    mutationFn: deleteTripNote,
+    onSuccess: () => {
+      Toast.show({
+        type: "success",
+        text1: "Trip Note Deleted Successfully",
+      });
+      router.back();
+    },
+    onError: () => {
+      Toast.show({
+        type: "error",
+        text1: "Trip Note Delete Failed",
+      });
+    },
+  });
+
+  const onPressDelete = () => {
+    Alert.alert(
+      "Delete Trip Note",
+      "Are you sure you want to delete this trip note?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: () => {
+            deleteMutation.mutate(tripNoteId as string);
+            // router.canGoBack() && router.back();
+          },
+        },
+      ],
+    );
+  };
+
+  if (isLoading) return <Loading />;
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header leftComponent={<BackButton />} title="Add Trip Note" />
+      <Header leftComponent={<BackButton />} title="Edit Trip Note" />
       <ControlledTextInput
         control={control}
         name="content"
@@ -76,13 +126,19 @@ const AddTripNotePage = () => {
         <Text style={styles.errorText}>{errors.noteDate.message}</Text>
       )}
       <TouchableOpacity onPress={handleSubmit(onSubmit)} style={styles.button}>
-        <Text>Add Note</Text>
+        <Text>Edit Note</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={onPressDelete}
+        style={[styles.button, { backgroundColor: "red" }]}
+      >
+        <Text>Delete Note</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
 };
 
-export default AddTripNotePage;
+export default EditTripNotePage;
 
 const styles = StyleSheet.create({
   container: {
@@ -90,10 +146,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   button: {
-    backgroundColor: "#418ee6ff",
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
+    backgroundColor: "#418ee6ff",
     alignItems: "center",
   },
   disabledButton: {
