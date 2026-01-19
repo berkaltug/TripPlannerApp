@@ -3,6 +3,7 @@ import ControlledDatePicker from "@/components/ControlledDatePicker";
 import ControlledTextInput from "@/components/ControlledTextInput";
 import Header from "@/components/Header";
 import Loading from "@/components/Loading";
+import { invalidateTripsQuery } from "@/lib/queryHelper";
 import { TripNoteSchema, tripNoteSchema } from "@/lib/schema/tripNoteSchema";
 import {
   deleteTripNote,
@@ -10,7 +11,7 @@ import {
   updateTripNote,
 } from "@/services/TripNoteService";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -21,6 +22,7 @@ import Toast from "react-native-toast-message";
 const EditTripNotePage = () => {
   const router = useRouter();
   const { tripNoteId, startDate, endDate } = useLocalSearchParams();
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: ["trip-note", tripNoteId],
@@ -35,7 +37,7 @@ const EditTripNotePage = () => {
     resolver: zodResolver(tripNoteSchema),
     mode: "onChange",
     values: {
-      content: data?.content,
+      content: data?.content as string,
       noteDate: new Date(data?.note_date as string),
     },
   });
@@ -46,6 +48,7 @@ const EditTripNotePage = () => {
         type: "success",
         text1: "Trip Note Updated Successfully",
       });
+      invalidateTripsQuery(queryClient);
       router.back();
     },
     onError: () => {
@@ -69,6 +72,7 @@ const EditTripNotePage = () => {
         type: "success",
         text1: "Trip Note Deleted Successfully",
       });
+      invalidateTripsQuery(queryClient);
       router.back();
     },
     onError: () => {

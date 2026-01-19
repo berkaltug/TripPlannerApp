@@ -2,10 +2,11 @@ import BackButton from "@/components/BackButton";
 import ControlledDatePicker from "@/components/ControlledDatePicker";
 import ControlledTextInput from "@/components/ControlledTextInput";
 import Header from "@/components/Header";
+import { invalidateTripsQuery } from "@/lib/queryHelper";
 import { TripNoteSchema, tripNoteSchema } from "@/lib/schema/tripNoteSchema";
 import { addTripNote } from "@/services/TripNoteService";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -15,6 +16,7 @@ import Toast from "react-native-toast-message";
 
 const AddTripNotePage = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const {
     control,
     handleSubmit,
@@ -33,6 +35,7 @@ const AddTripNotePage = () => {
         type: "success",
         text1: "Trip Note Added Successfully",
       });
+      invalidateTripsQuery(queryClient);
       router.back();
     },
     onError: () => {
